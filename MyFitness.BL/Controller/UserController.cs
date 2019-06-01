@@ -17,33 +17,61 @@ namespace MyFitness.BL.Controller
         /// <summary>
         /// Пользователь приложения.
         /// </summary>
-        public User User { get; }
+        public List<User> Users { get; }
+
+        public User CurrentUser { get; }
+
+        public bool IsNewUser { get; } = false;
         /// <summary>
         /// Создание нового контроллера пользователя.
         /// </summary>
         /// <param name="user"></param>
-        public UserController (string userName, 
-                               string genderName, 
-                               DateTime birthData,
-                               double height,
-                               double weight)
+        public UserController (string userName)
         {
-            var gender = new Gender(genderName);
-            User = new User(userName,gender, birthData, height, weight);            
+            if (string.IsNullOrWhiteSpace(userName))
+            {
+                throw new ArgumentNullException("Имя пользователь не может быть пустым", nameof(userName));
+            }
+            Users = GetUsersDate();
+
+            CurrentUser = Users.SingleOrDefault(u => u.Name == userName);
+            if(CurrentUser == null)
+            {
+                CurrentUser = new User(userName);
+                Users.Add(CurrentUser);
+                IsNewUser = true;
+                Save();
+            }
         }
         /// <summary>
-        /// Получение данных пользователя
+        /// Получить сохраненый список пользователей.
         /// </summary>
-        public UserController()
+        /// <returns>Список пользователей. </returns>
+        private List<User> GetUsersDate()
         {
             var formatter = new BinaryFormatter();
             using (var fs = new FileStream("users.dat", FileMode.OpenOrCreate))
             {
-                if(formatter.Deserialize(fs) is User user)
+                if(formatter.Deserialize(fs) is List<User> users)
                 {
-                    User = user;
+                   return users;
                 }
-            }
+                else
+                {
+                    return new List<User>();
+                }
+            }  
+        }
+
+        public void SetNewUserDate(string genderName, DateTime birthDate, double weight = 1, double height = 1)
+        {
+            //проверка
+            CurrentUser.Gender = new Gender(genderName);
+            CurrentUser.BirthData = birthDate;
+            CurrentUser.Weight = weight;
+            CurrentUser.Height = height;
+            Save();
+
         }
         /// <summary>
         /// Сохранить данные пользователя.
@@ -53,7 +81,7 @@ namespace MyFitness.BL.Controller
             var formatter = new BinaryFormatter();
             using(var fs = new FileStream("users.dat", FileMode.OpenOrCreate))
             {
-                formatter.Serialize(fs, User);
+                formatter.Serialize(fs, Users);
             }
         }
     }

@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 
 namespace MyFitness.BL.Model
 {
@@ -21,11 +16,11 @@ namespace MyFitness.BL.Model
         /// <summary>
         /// Пол.
         /// </summary>
-        public Gender Gender { get; }
+        public Gender Gender { get; set; }
         /// <summary>
         /// Дата рождение.
         /// </summary>
-        public DateTime BirthData { get; }
+        public DateTime BirthData { get; set; }
         /// <summary>
         /// Рост.
         /// </summary>
@@ -34,6 +29,8 @@ namespace MyFitness.BL.Model
         /// Вес.
         /// </summary>
         public double Weight { get; set; }
+
+        public int Age { get { return DateTime.Now.Year - BirthData.Year; } }
         #endregion
         /// <summary>
         /// Добавление нового пользователя
@@ -80,10 +77,19 @@ namespace MyFitness.BL.Model
             Weight = weight;
         }
 
+        public User(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("Имя пользователя не может быть пустым или null", nameof(name));
+            }
+
+            Name = name;
+        }
 
         public override string ToString()
         {
-            return Name;
+            return Name+" "+Age;
         }
     }
    
