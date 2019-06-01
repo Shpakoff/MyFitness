@@ -9,7 +9,7 @@ namespace MyFitness.BL.Model
     /// <summary>
     /// Пол.
     /// </summary>
-    class Gender
+    public class Gender
     {
         /// <summary>
         /// Название. 

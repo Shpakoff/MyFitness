@@ -4,12 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace MyFitness.BL.Model
 {
     /// <summary>
     /// Пользователь.
     /// </summary>
-    class User
+    [Serializable]
+    public class User
     {
         #region Свойства
         /// <summary>
@@ -77,6 +79,7 @@ namespace MyFitness.BL.Model
             Height = height;
             Weight = weight;
         }
+
 
         public override string ToString()
         {
