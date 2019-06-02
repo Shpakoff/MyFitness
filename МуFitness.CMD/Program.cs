@@ -1,4 +1,5 @@
 ﻿using MyFitness.BL.Controller;
+using MyFitness.BL.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +17,8 @@ namespace МуFitness.CMD
             Console.WriteLine("Введите имя пользователя");
             var name = Console.ReadLine();
 
-            var userController = new UserController(name);           
+            var userController = new UserController(name);
+            var eatingController = new EatingController(userController.CurrentUser);
             if (userController.IsNewUser)
             {
                 Console.Write("Введите пол: ");
@@ -29,7 +31,38 @@ namespace МуFitness.CMD
             }
 
             Console.WriteLine(userController.CurrentUser);
+
+            Console.WriteLine("Что вы хотите сделать");
+            Console.WriteLine("Е - ввести приём пищи");
+            var key = Console.ReadKey();
+            Console.WriteLine();
+            if (key.Key == ConsoleKey.E)
+            {
+                var foods = EnterEating();
+                eatingController.Add(foods.Food, foods.Weight);
+
+                foreach(var item in eatingController.Eating.Foods){
+                    Console.WriteLine($"\t {item.Key} - {item.Value}");
+                }
+            }
             Console.ReadLine();
+        }
+
+        private static (Food Food, double Weight) EnterEating()
+        {
+            Console.Write("Введите имя продукта:");
+            var foodName = Console.ReadLine();
+            var calories = ParseDouble("калорийность");
+            var proteins = ParseDouble("белки");
+            var fats = ParseDouble("жиры");
+            var carbohydrates = ParseDouble("углеводы");
+
+            Console.WriteLine("Введите вес порции: ");
+            var weight = ParseDouble("вес порции");
+
+            var food = new Food(foodName, calories,proteins,fats,carbohydrates);
+            return (Food: food, Weight: weight);
+
         }
 
         private static DateTime ParseDateTime()
