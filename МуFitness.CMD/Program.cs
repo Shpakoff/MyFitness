@@ -2,7 +2,9 @@
 using MyFitness.BL.Model;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Resources;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,15 +15,17 @@ namespace МуFitness.CMD
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Вас приветдствует приложение MyFitness");
-            Console.WriteLine("Введите имя пользователя");
+            var culture = CultureInfo.CurrentCulture;
+            var resourseManager = new ResourceManager("МуFitness.CMD.Languages.Messages",typeof(Program).Assembly);
+            Console.WriteLine(resourseManager.GetString("Hello", culture));
+            Console.WriteLine(resourseManager.GetString("EnterName", culture));
             var name = Console.ReadLine();
 
             var userController = new UserController(name);
             var eatingController = new EatingController(userController.CurrentUser);
             if (userController.IsNewUser)
             {
-                Console.Write("Введите пол: ");
+                Console.Write(resourseManager.GetString("EnterGender", culture));
                 var gender = Console.ReadLine();
                 var birthDate = ParseDateTime();
                 var weight = ParseDouble("вес");
@@ -56,8 +60,6 @@ namespace МуFitness.CMD
             var proteins = ParseDouble("белки");
             var fats = ParseDouble("жиры");
             var carbohydrates = ParseDouble("углеводы");
-
-            Console.WriteLine("Введите вес порции: ");
             var weight = ParseDouble("вес порции");
 
             var food = new Food(foodName, calories,proteins,fats,carbohydrates);
