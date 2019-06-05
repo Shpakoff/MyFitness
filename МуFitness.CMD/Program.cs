@@ -23,33 +23,68 @@ namespace МуFitness.CMD
 
             var userController = new UserController(name);
             var eatingController = new EatingController(userController.CurrentUser);
+            var exerciseController = new ExerciseController(userController.CurrentUser);
             if (userController.IsNewUser)
             {
                 Console.Write(resourseManager.GetString("EnterGender", culture));
                 var gender = Console.ReadLine();
-                var birthDate = ParseDateTime();
+                var birthDate = ParseDateTime("дата рождения");
                 var weight = ParseDouble("вес");
                 var height = ParseDouble("рост");
 
                 userController.SetNewUserDate(gender, birthDate, weight, height);
             }
 
-            Console.WriteLine(userController.CurrentUser);
-
-            Console.WriteLine("Что вы хотите сделать");
-            Console.WriteLine("Е - ввести приём пищи");
-            var key = Console.ReadKey();
-            Console.WriteLine();
-            if (key.Key == ConsoleKey.E)
+            
+            while (true)
             {
-                var foods = EnterEating();
-                eatingController.Add(foods.Food, foods.Weight);
+                Console.WriteLine(userController.CurrentUser);
 
-                foreach(var item in eatingController.Eating.Foods){
-                    Console.WriteLine($"\t {item.Key} - {item.Value}");
+                Console.WriteLine("Что вы хотите сделать");
+                Console.WriteLine("Е - ввести приём пищи");
+                Console.WriteLine("A - ввести упражнение");
+                Console.WriteLine("Q - выход");
+                var key = Console.ReadKey();
+                Console.WriteLine();
+                switch (key.Key)
+                {
+                    case ConsoleKey.E:
+                        var foods = EnterEating();
+                        eatingController.Add(foods.Food, foods.Weight);
+
+                        foreach (var item in eatingController.Eating.Foods)
+                        {
+                            Console.WriteLine($"\t {item.Key} - {item.Value}");
+                        }
+                        break;
+                    case ConsoleKey.A:
+                        var exe = EnterExercise();
+                     
+                        exerciseController.Add(exe.Activity, exe.Begin, exe.End);
+                        foreach (var item in exerciseController.Exercises)
+                        {
+                            Console.WriteLine($"\t {item.Activity.Name} c {item.Start.ToShortTimeString()} до {item.Finish.ToShortTimeString()}");
+                        }
+                        break;
+                    case ConsoleKey.Q:
+                        Environment.Exit(0);
+                        break;
                 }
+                Console.ReadLine();
             }
-            Console.ReadLine();
+           
+        }
+
+        private static (Activity Activity, DateTime Begin, DateTime End) EnterExercise()
+        {
+            Console.Write("Введите название упражнения: ");
+            var nameExercise = Console.ReadLine();
+            var energy = ParseDouble("расход энергии");
+            var begin = ParseDateTime("начало упражнения");
+
+            var end = ParseDateTime("конец упражнения");
+            var activity = new Activity(nameExercise, energy);
+            return (activity, begin, end);
         }
 
         private static (Food Food, double Weight) EnterEating()
@@ -67,19 +102,19 @@ namespace МуFitness.CMD
 
         }
 
-        private static DateTime ParseDateTime()
+        private static DateTime ParseDateTime(string value)
         {
             DateTime birthDate;
             while (true)
             {
-                Console.Write("Введите дату рождения (dd.mm.yyyy): ");
+                Console.Write($"Введите {value} (dd.mm.yyyy): ");
                 if (DateTime.TryParse(Console.ReadLine(), out birthDate))
                 {
                     break;
                 }
                 else
                 {
-                    Console.WriteLine("Введён неверный формат");
+                    Console.WriteLine($"Введён неверный формат {value}");
                 }
             }
 
